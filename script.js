@@ -1,20 +1,20 @@
 const container = document.getElementById('birthday-container');
 let elapsed = 0;
-let duration = 60; // seconds
-let cartCount = 0; // Track number of carts
+let duration = 60;
+let cartIndex = 0;
+let cartDisplayCount = 0;
 
-// Load your 7 image paths
-const imagePaths = [
-  'images/img1.jpg',
-  'images/img2.jpg',
-  'images/img3.jpg',
-  'images/img4.jpg',
-  'images/img5.jpg',
-  'images/img6.jpg',
-  'images/img7.jpg'
+const birthdayMessages = [
+  "Happy Birthday Meri Shivi 🎉",
+  "May your day be filled with joy 🥳",
+  "Keep shining like a star 🌟",
+  "Wishing you lots of cake 🎂",
+  "Celebrate with laughter 😄",
+  "Make amazing memories 📸",
+  "Enjoy every moment ❤️"
 ];
 
-// Animation for text display
+// Create text
 function createText() {
   const el = document.createElement('div');
   el.classList.add('happy-text');
@@ -22,7 +22,7 @@ function createText() {
   el.style.left = Math.random() * 90 + 'vw';
   el.style.top = Math.random() * 60 + 30 + 'vh';
   container.appendChild(el);
-  setTimeout(() => el.remove(), 5000);
+  setTimeout(() => el.remove(), 10000);  // Text displayed for 10 seconds
 }
 
 // Create floating images
@@ -36,37 +36,77 @@ function createImage() {
   setTimeout(() => img.remove(), 6000);
 }
 
-// Create carts with custom messages after 20 seconds
+// Create carts
 function createCart(text) {
-  if (cartCount >= 10) return; // Limit to 10 carts
-
   const cart = document.createElement('div');
   cart.classList.add('birthday-cart');
   cart.innerText = text;
   container.appendChild(cart);
-  cartCount++; // Increment cart counter
-  setTimeout(() => cart.remove(), 7000); // Remove after 7 seconds
+  setTimeout(() => cart.remove(), 7000);
+  cartDisplayCount++;
 }
 
-// Animation logic
+// Create typewriter text (full screen after 7 carts)
+function createFullScreenText() {
+  const textElement = document.createElement('div');
+  textElement.classList.add('typewriter-text');
+  textElement.innerText = 'Meri shivi hamesa happy rahe 🎉';
+  
+  // Make text occupy the full screen
+  textElement.style.position = 'absolute';
+  textElement.style.top = '50%';
+  textElement.style.left = '50%';
+  textElement.style.transform = 'translate(-50%, -50%)';
+  textElement.style.fontSize = '50px'; // Adjust text size for full screen
+  textElement.style.textAlign = 'center';
+  textElement.style.color = '#fff';
+  textElement.style.fontWeight = 'bold';
+  
+  container.appendChild(textElement);
+
+  // Fade out after 5 seconds
+  setTimeout(() => {
+    textElement.classList.add('fade-out');
+  }, 5000);
+
+  setTimeout(() => textElement.remove(), 8000);
+}
+
+// Check if typewriter text is already in localStorage
+function checkStoredText() {
+  const storedText = localStorage.getItem('thankYouText');
+  if (storedText) {
+    const textElement = document.createElement('div');
+    textElement.classList.add('typewriter-text');
+    textElement.innerText = storedText;
+    container.appendChild(textElement);
+  }
+}
+
+// Images array
+const imagePaths = [
+  'images/img1.jpg',
+  'images/img2.jpg',
+  'images/img3.jpg',
+  'images/img4.jpg',
+  'images/img5.jpg',
+  'images/img6.jpg',
+  'images/img7.jpg'
+];
+
+// Main animation loop
 const interval = setInterval(() => {
   if (elapsed < 10) {
-    createText(); // Only text (Happy Birthday)
-  } else if (elapsed >= 10 && elapsed < 20) {
-    createText();  // Continue text
-    createImage(); // Add floating images
-  } else {
-    // After 20 sec — create carts one by one with animation
-    createCart("Happy Birthday Meri Shivi 🎉");
-    createCart("May your day be filled with joy 🥳");
-    createCart("Keep shining like a star 🌟");
-    createCart("Wishing you lots of cake 🎂");
-    createCart("Celebrate with laughter 😄");
-    createCart("Make amazing memories 📸");
-    createCart("Enjoy every moment ❤️");
-    createCart("You're amazing! 💖");
-    createCart("Have a fantastic year ahead 🎉");
-    createCart("Wishing you all the happiness! 🌸");
+    createText();
+  } else if (elapsed >= 10 && elapsed < 30) {  // Duration increased to 30 seconds
+    createText();
+    createImage();
+  } else if (elapsed >= 30 && cartDisplayCount < 7) {  // 7 carts only
+    if ((elapsed - 30) >= cartDisplayCount * 2) {  // Delay after 30 seconds
+      createCart(birthdayMessages[cartDisplayCount]);
+    }
+  } else if (cartDisplayCount >= 7) {
+    createFullScreenText(); // Full screen text after all carts are shown
   }
 
   elapsed += 0.4;
@@ -75,3 +115,6 @@ const interval = setInterval(() => {
     clearInterval(interval);
   }
 }, 400);
+
+// Call function to check if stored text is present in localStorage
+checkStoredText();
